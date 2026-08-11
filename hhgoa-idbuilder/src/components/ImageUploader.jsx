@@ -1,10 +1,8 @@
 import { useState, useCallback, useRef } from 'react'
-import { Upload, Loader2 } from 'lucide-react'
 import { convertHeicToPng } from '../utils/helpers'
 
 export default function ImageUploader({ onUpload, isProcessing }) {
   const [isDragActive, setIsDragActive] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(null)
   const fileInputRef = useRef(null)
 
   const handleDrag = useCallback((e) => {
@@ -21,51 +19,34 @@ export default function ImageUploader({ onUpload, isProcessing }) {
     e.preventDefault()
     e.stopPropagation()
     setIsDragActive(false)
-    
     const file = e.dataTransfer.files[0]
-    if (file && isValidImageFile(file)) {
-      await processFile(file)
-    }
-  }, [])
+    if (file) await processFile(file)
+  }, [onUpload])
 
   const handleFileSelect = useCallback(async (e) => {
     const file = e.target.files[0]
-    if (file && isValidImageFile(file)) {
-      await processFile(file)
-    }
+    if (file) await processFile(file)
     e.target.value = ''
-  }, [])
+  }, [onUpload])
 
   const processFile = async (file) => {
-    setUploadProgress(0)
     try {
       let imageFile = file
       if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
-        setUploadProgress(50)
         imageFile = await convertHeicToPng(file)
       }
-      setUploadProgress(100)
       await onUpload(imageFile)
     } catch (err) {
       console.error('Upload failed:', err)
-      alert('Failed to process image. Please try another file.')
-    } finally {
-      setTimeout(() => setUploadProgress(null), 500)
     }
-  }
-
-  const isValidImageFile = (file) => {
-    const validTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif']
-    const validExts = ['.jpg', '.jpeg', '.png', '.heic', '.heif']
-    return validTypes.includes(file.type) || validExts.some(ext => file.name.toLowerCase().endsWith(ext))
   }
 
   const openFileDialog = () => fileInputRef.current?.click()
 
   return (
-    <div style={{ maxWidth: '520px', margin: '0 auto' }}>
+    <div style={{ width: '100%', maxWidth: '440px' }}>
       <div
-        className={`upload-zone ${isDragActive ? 'active' : ''}`}
+        className={`upload-zone field-texture field-drift ${isDragActive ? 'active' : ''}`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
@@ -75,83 +56,54 @@ export default function ImageUploader({ onUpload, isProcessing }) {
         tabIndex={0}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && openFileDialog()}
         aria-label="Upload image"
+        style={{
+          aspectRatio: '1',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '20px',
+          padding: '24px',
+        }}
       >
+        {/* Corner brackets */}
+        <span className="corner-bracket tl" />
+        <span className="corner-bracket tr" />
+        <span className="corner-bracket bl" />
+        <span className="corner-bracket br" />
+
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/heic,image/heif"
+          accept="image/*,.heic,.heif"
           onChange={handleFileSelect}
-          style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+          style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
           aria-hidden="true"
           disabled={isProcessing}
         />
-        
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-          {/* Upload button */}
-          <button
-            className="btn-primary"
-            style={{ pointerEvents: 'none' }}
-            tabIndex={-1}
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 style={{ width: 18, height: 18 }} className="animate-spin" />
-                PROCESSING...
-              </>
-            ) : (
-              <>
-                <Upload style={{ width: 18, height: 18 }} />
-                UPLOAD A PHOTO
-              </>
-            )}
-          </button>
 
-          {/* Progress bar */}
-          {uploadProgress !== null && (
-            <div style={{
-              width: '200px',
-              height: '3px',
-              background: 'rgba(254,252,232,0.1)',
-              borderRadius: '2px',
-              overflow: 'hidden',
-            }}>
-              <div 
-                style={{
-                  height: '100%',
-                  width: `${uploadProgress}%`,
-                  background: 'var(--yellow)',
-                  transition: 'width 0.3s ease-out',
-                  borderRadius: '2px',
-                }}
-              />
-            </div>
-          )}
+        <button
+          type="button"
+          className="btn-accent brutal brutal-press sheen"
+          style={{ pointerEvents: 'none' }}
+          tabIndex={-1}
+          disabled={isProcessing}
+        >
+          {isProcessing ? 'PROCESSING...' : 'UPLOAD A PHOTO'}
+        </button>
 
-          {/* File type hints */}
-          <div style={{ textAlign: 'center' }}>
-            <p style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.65rem',
-              fontWeight: 500,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'var(--fg-muted)',
-              marginBottom: '4px',
-            }}>
-              JPG • PNG • HEIC • WEBP
-            </p>
-            <p style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.6rem',
-              fontWeight: 400,
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-              color: 'rgba(254,252,232,0.3)',
-            }}>
-              ANY SHAPE — WE'LL FRAME IT
-            </p>
-          </div>
-        </div>
+        <p style={{
+          maxWidth: '16rem',
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '11px',
+          lineHeight: 1.625,
+          letterSpacing: '0.14em',
+          color: 'rgba(255, 251, 232, 0.55)',
+          textAlign: 'center',
+        }}>
+          JPG · PNG · HEIC · WEBP<br />
+          ANY SHAPE — WE'LL FRAME IT
+        </p>
       </div>
     </div>
   )

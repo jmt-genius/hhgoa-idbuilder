@@ -7,23 +7,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        hhgoa: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-          950: '#052e16',
+        brand: {
+          primary: '#0b6839',
+          accent: '#fee101',
+          pink: '#ff0080',
+          lime: '#9ac95f',
+          offwhite: '#fffbe8',
+          night: '#04170d',
         },
       },
       fontFamily: {
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        display: ['Playfair Display', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
     },
   },

@@ -1,77 +1,130 @@
+import { useEffect, useRef } from 'react'
+
 export default function Header() {
+  const hackerRef = useRef(null)
+  const houseRef = useRef(null)
+  const goaRef = useRef(null)
+  const infoRef = useRef(null)
+  const taglineRef = useRef(null)
+
+  useEffect(() => {
+    // Animate in sequence
+    const els = [hackerRef.current, houseRef.current, goaRef.current, infoRef.current, taglineRef.current]
+    els.forEach((el, i) => {
+      if (!el) return
+      setTimeout(() => {
+        el.style.opacity = '1'
+        el.style.transform = 'translateY(0) rotate(0deg) scale(1)'
+      }, 80 + i * 120)
+    })
+  }, [])
+
   return (
-    <header className="relative z-50">
-      <div className="container-padding max-w-7xl mx-auto">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Left: 2:47 PM Studio style badge */}
-          <a 
-            href="https://hhgoa.dev" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="group"
+    <header style={{
+      marginBottom: '36px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      textAlign: 'center',
+      width: '100%',
+      maxWidth: '24rem',
+    }}>
+      {/* Title row: HACKER HOUSE + गोवा */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+        gap: '12px',
+        flexWrap: 'wrap',
+      }}>
+        <h1
+          className="font-display"
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: '0 12px',
+            fontSize: 'clamp(2.6rem, 13vw, 3.6rem)',
+            lineHeight: 0.85,
+            letterSpacing: '-0.025em',
+            color: 'var(--brand-accent)',
+            textShadow: '5px 5px 0 #000',
+          }}
+        >
+          <span
+            ref={hackerRef}
+            style={{
+              display: 'inline-block',
+              opacity: 0,
+              transform: 'translateY(22px) rotate(-4deg)',
+              transition: 'opacity 0.42s var(--ease-snap), transform 0.42s var(--ease-snap)',
+            }}
           >
-            <div
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.65rem',
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--fg)',
-                opacity: 0.7,
-                transition: 'opacity 0.2s',
-              }}
-              className="group-hover:opacity-100"
-            >
-              HH GOA 2026
-            </div>
-          </a>
+            HACKER
+          </span>
+          <span
+            ref={houseRef}
+            style={{
+              display: 'inline-block',
+              opacity: 0,
+              transform: 'translateY(22px) rotate(-4deg)',
+              transition: 'opacity 0.42s var(--ease-snap), transform 0.42s var(--ease-snap)',
+            }}
+          >
+            HOUSE
+          </span>
+        </h1>
 
-          {/* Right: Nav links */}
-          <nav className="flex items-center gap-4 md:gap-6">
-            <a
-              href="https://x.com/hashtag/FrameInGoa"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--fg)',
-                opacity: 0.6,
-                textDecoration: 'none',
-                transition: 'opacity 0.2s',
-              }}
-              className="hidden sm:block hover:opacity-100"
-            >
-              CHECK HYPE
-            </a>
-
-            <a
-              href="#create"
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: '#1a1a1a',
-                background: 'var(--yellow)',
-                padding: '8px 20px',
-                border: '3px solid #1a1a1a',
-                borderRadius: '4px',
-                textDecoration: 'none',
-                transition: 'all 0.2s',
-                boxShadow: '3px 3px 0 rgba(0,0,0,0.3)',
-              }}
-            >
-              CREATE
-            </a>
-          </nav>
-        </div>
+        <img
+          ref={goaRef}
+          src="/goa-devanagari.png"
+          alt="गोवा"
+          width="724"
+          height="720"
+          style={{
+            marginBottom: '4px',
+            height: '48px',
+            width: 'auto',
+            opacity: 0,
+            transform: 'scale(0.6)',
+            transition: 'opacity 0.42s var(--ease-snap), transform 0.42s var(--ease-snap)',
+          }}
+        />
       </div>
+
+      {/* Event info */}
+      <p
+        ref={infoRef}
+        style={{
+          marginTop: '16px',
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '11px',
+          letterSpacing: '0.28em',
+          color: 'var(--brand-lime)',
+          opacity: 0,
+          transform: 'translateY(10px)',
+          transition: 'opacity 0.3s ease, transform 0.3s ease',
+        }}
+      >
+        OCT 28–31 · 2026 · GOA
+      </p>
+
+      {/* Tagline */}
+      <p
+        ref={taglineRef}
+        style={{
+          marginTop: '8px',
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '11px',
+          letterSpacing: '0.16em',
+          color: 'rgba(255, 251, 232, 0.55)',
+          opacity: 0,
+          transform: 'translateY(10px)',
+          transition: 'opacity 0.3s ease, transform 0.3s ease',
+        }}
+      >
+        LESS NOISE. MORE SIGNAL.
+      </p>
     </header>
   )
 }
