@@ -1,0 +1,374 @@
+.poster-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #000;
+  background-image: url('/poster-bg.gif');
+  background-size: cover;
+  background-position: center;
+  font-family: 'Space Mono', monospace;
+  overflow: hidden;
+}
+
+.poster-root {
+  --cream: #f4efdd;
+  --pink: #ff2f7e;
+  --yellow: #f4c93c;
+  --dark-green: #0d1f12;
+  position: relative;
+  width: 1600px;
+  height: 900px;
+  max-width: 100%;
+  aspect-ratio: 1600/900;
+  overflow: hidden;
+  color: var(--cream);
+}
+
+.poster-root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.06) 18%, rgba(0, 0, 0, 0) 32%);
+  pointer-events: none;
+}
+
+/* ---------- corner cross marks ---------- */
+.cross {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  opacity: 0.55;
+}
+
+.cross::before,
+.cross::after {
+  content: "";
+  position: absolute;
+  background: var(--yellow);
+}
+
+.cross::before {
+  left: 50%;
+  top: 0;
+  width: 1.5px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.cross::after {
+  top: 50%;
+  left: 0;
+  height: 1.5px;
+  width: 100%;
+  transform: translateY(-50%);
+}
+
+.cross.pink::before,
+.cross.pink::after {
+  background: var(--pink);
+}
+
+.cross.tl {
+  top: 118px;
+  left: 10px;
+}
+
+.cross.bl {
+  bottom: 150px;
+  left: 12px;
+}
+
+.cross.br {
+  top: 96px;
+  right: 20px;
+}
+
+.cross.mid-right {
+  top: 172px;
+  right: 6px;
+  opacity: 0.4;
+}
+
+.top-left-branding {
+  position: absolute;
+  top: 30px;
+  left: 60px;
+  z-index: 10;
+}
+
+.top-right-branding {
+  position: absolute;
+  top: 24px;
+  right: 48px;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.custom-logo {
+  width: 90px;
+  height: auto;
+}
+
+.hh-stacked-text {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  line-height: 0.9;
+  font-family: 'Imbue', Georgia, serif;
+  font-variation-settings: 'opsz' 100;
+  letter-spacing: 0.02em;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.hh-stacked-text .hh-word {
+  color: var(--cream);
+  font-size: 32px;
+}
+
+.devanagari-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: auto;
+  z-index: 2;
+  opacity: 0.9;
+}
+
+.top-x {
+  position: absolute;
+  top: 44px;
+  left: 196px;
+  font-size: 20px;
+  color: var(--cream);
+  opacity: 0.8;
+  font-weight: 700;
+}
+
+.top-labels {
+  position: absolute;
+  top: 30px;
+  left: 230px;
+  line-height: 1.55;
+}
+
+.top-labels .l1 {
+  display: block;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+.top-labels .l2 {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--cream);
+  opacity: 0.85;
+}
+
+.top-rule {
+  position: absolute;
+  top: 112px;
+  left: 28px;
+  width: 1000px;
+  height: 0;
+  border-top: 1px dashed rgba(244, 239, 221, 0.28);
+}
+
+/* ---------- headline block ---------- */
+.headline {
+  position: absolute;
+  top: 132px;
+  left: 44px;
+  line-height: 0.86;
+}
+
+.headline .word {
+  font-family: 'Imbue', Georgia, serif;
+  font-variation-settings: 'opsz' 100;
+  font-weight: 900;
+  text-transform: uppercase;
+  display: block;
+  letter-spacing: -0.025em;
+}
+
+.headline .frame {
+  font-size: 240px;
+  color: var(--cream);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.headline .in {
+  font-size: 240px;
+  color: var(--pink);
+  margin-top: -30px;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.headline .goa {
+  font-size: 240px;
+  color: var(--yellow);
+  margin-top: -30px;
+  padding-left: 150px;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.tagline {
+  position: absolute;
+  top: 472px;
+  left: 530px;
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+  color: var(--cream);
+  max-width: 220px;
+}
+
+/* ---------- info block bottom-left ---------- */
+.info-block {
+  position: absolute;
+  bottom: 150px;
+  left: 44px;
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--cream);
+}
+
+.info-block .row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+  opacity: 0.95;
+}
+
+.info-block .icon {
+  color: var(--yellow);
+  font-size: 14px;
+  width: 14px;
+  text-align: center;
+}
+
+.info-block .tag {
+  color: var(--pink);
+  font-weight: 700;
+}
+
+/* ---------- bottom bar ---------- */
+.bottom-rule {
+  position: absolute;
+  bottom: 96px;
+  left: 0;
+  width: 100%;
+  border-top: 1px dashed rgba(244, 239, 221, 0.3);
+}
+
+.bottom-bar {
+  position: absolute;
+  bottom: 38px;
+  left: 44px;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--cream);
+}
+
+.bottom-bar .divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(244, 239, 221, 0.35);
+}
+
+.bottom-bar .built {
+  font-weight: 700;
+}
+
+.bottom-bar .coords {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.9;
+}
+
+.bottom-bar .coords .globe {
+  color: var(--yellow);
+}
+
+/* ---------- CREATE button ---------- */
+.create-btn {
+  position: absolute;
+  bottom: 32px;
+  right: 44px;
+  width: 300px;
+  height: 70px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.create-btn:hover .face {
+  transform: translate(-4px, -4px);
+}
+
+.create-btn:active .face {
+  transform: translate(2px, 2px);
+}
+
+.create-btn .shadow {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 100%;
+  height: 100%;
+  background: var(--pink);
+  border-radius: 2px;
+}
+
+.create-btn .face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--yellow);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  letter-spacing: 0.04em;
+  color: var(--dark-green);
+  transition: transform 0.15s ease;
+}
+
+.create-btn .face svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* ---------- responsive scaling ---------- */
+@media (max-width: 1600px) {
+  .poster-container {
+    align-items: flex-start;
+  }
+
+  .poster-root {
+    transform-origin: top left;
+    transform: scale(var(--scale, 1));
+  }
+}

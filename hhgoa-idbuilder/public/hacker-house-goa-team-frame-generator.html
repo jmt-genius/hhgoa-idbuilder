@@ -477,18 +477,26 @@ function drawCard(){
   canvas.width = BASE_W;
   canvas.height = BASE_H;
   ctx.clearRect(0,0,BASE_W,BASE_H);
-  ctx.drawImage(tplImg, 0, 0, BASE_W, BASE_H);
 
+  // Draw images first with a slightly expanded clip mask to prevent sub-pixel gaps
   SLOTS.forEach((slot, i) => {
     const m = members[i];
     if(m.img){
       ctx.save();
-      circleClip(ctx, slot.cx, slot.cy, slot.r);
+      circleClip(ctx, slot.cx, slot.cy, slot.r + 2);
       ctx.clip();
       const {dx,dy,dw,dh} = fitCoverCircle(m.img, slot.cx, slot.cy, slot.r, m.zoom);
       ctx.drawImage(m.img, dx, dy, dw, dh);
       ctx.restore();
     }
+  });
+
+  // Draw template on top to perfectly mask the image edges
+  ctx.drawImage(tplImg, 0, 0, BASE_W, BASE_H);
+
+  // Draw text on top of everything
+  SLOTS.forEach((slot, i) => {
+    const m = members[i];
     drawText(slot.name, m.name, '#f6cf1f', 800, 22);
     drawText(slot.role, m.role, '#e8226f', 700, 15);
   });
