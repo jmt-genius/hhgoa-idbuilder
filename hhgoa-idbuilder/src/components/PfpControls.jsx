@@ -6,6 +6,8 @@ const RING_COLORS = [
   { id: 'night', color: '#1a1a2e', label: 'Night' },
   { id: 'sunset', color: '#ff6b35', label: 'Sunset' },
   { id: 'cream', color: '#fffbe8', label: 'Cream' },
+  { id: 'cyan', color: '#00e5ff', label: 'Cyan' },
+  { id: 'pink', color: '#ff0080', label: 'Pink' },
   { id: 'holo', color: 'conic-gradient(from 0deg, #ff0080, #fee101, #22c55e, #00bfff, #ff0080)', label: 'Holo' },
 ]
 
@@ -16,6 +18,41 @@ const PHOTO_LOOKS = [
   { id: 'grain', label: 'GRAIN' },
 ]
 
+const PRESETS = [
+  {
+    id: 'neon',
+    label: '🌴 NEON GOA',
+    desc: 'Classic green neon',
+    ringColor: 'green',
+    ringWeight: 10,
+    photoLook: 'asshot',
+  },
+  {
+    id: 'cyberpunk',
+    label: '⚡ CYBERPUNK',
+    desc: 'Hot pink bold',
+    ringColor: 'pink',
+    ringWeight: 14,
+    photoLook: 'punch',
+  },
+  {
+    id: 'sunset',
+    label: '🌅 GOA SUNSET',
+    desc: 'Warm sunset vibes',
+    ringColor: 'sunset',
+    ringWeight: 12,
+    photoLook: 'grain',
+  },
+  {
+    id: 'holo',
+    label: '✨ HOLOGRAPHIC',
+    desc: 'Rainbow holo',
+    ringColor: 'holo',
+    ringWeight: 10,
+    photoLook: 'asshot',
+  },
+]
+
 export default function PfpControls({
   ringColor, onRingColorChange,
   ringWeight, onRingWeightChange,
@@ -23,6 +60,7 @@ export default function PfpControls({
   zoom, onZoomChange,
   showBadge, onShowBadgeChange,
   onSurpriseMe,
+  onApplyPreset,
   onChangePhoto,
   onDownload,
   onShare,
@@ -30,6 +68,24 @@ export default function PfpControls({
 }) {
   return (
     <div className="reveal-panel" style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', maxWidth: '440px' }}>
+
+      {/* Presets */}
+      <div>
+        <div className="section-label">QUICK PRESETS</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          {PRESETS.map((preset) => (
+            <button
+              key={preset.id}
+              className="preset-btn"
+              onClick={() => onApplyPreset(preset)}
+              title={preset.desc}
+            >
+              <span className="preset-emoji">{preset.label.split(' ')[0]}</span>
+              <span className="preset-text">{preset.label.split(' ').slice(1).join(' ')}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Ring Color */}
       <div>
@@ -51,18 +107,17 @@ export default function PfpControls({
           ))}
         </div>
       </div>
-
-      {/* Ring Weight */}
+      {/* Ring Thickness */}
       <div>
-        <div className="section-label">RING WEIGHT</div>
+        <div className="section-label">RING THICKNESS</div>
         <input
           type="range"
-          min="2"
-          max="20"
+          min="4"
+          max="24"
           value={ringWeight}
           onChange={(e) => onRingWeightChange(Number(e.target.value))}
           className="range-slider"
-          aria-label="Ring weight"
+          aria-label="Ring thickness"
         />
       </div>
 
@@ -149,4 +204,4 @@ export default function PfpControls({
   )
 }
 
-export { RING_COLORS, PHOTO_LOOKS }
+export { RING_COLORS, PHOTO_LOOKS, PRESETS }

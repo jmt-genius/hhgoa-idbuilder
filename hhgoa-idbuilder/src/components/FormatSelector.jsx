@@ -1,8 +1,10 @@
 export default function FormatSelector({ value, onChange }) {
-  const idx = value === 'pfp' ? 0 : 1
+  let idx = 0
+  if (value === 'builder') idx = 1
+  if (value === 'team') idx = 2
 
   return (
-    <div className="tab-toggle" role="tablist" aria-label="Output format">
+    <div className="tab-toggle" role="tablist" aria-label="Output format" style={{ maxWidth: '36rem' }}>
       {/* Shadow pill (behind) */}
       <div className="tab-toggle-shadow" data-active={idx} />
       {/* Accent pill (front) */}
@@ -16,18 +18,29 @@ export default function FormatSelector({ value, onChange }) {
         onClick={() => onChange('pfp')}
       >
         PFP FRAME
-        <span>for your X avatar</span>
+        <span>X Avatar</span>
       </button>
 
       <button
         role="tab"
-        aria-selected={value === 'badge'}
-        data-selected={String(value === 'badge')}
+        aria-selected={value === 'builder'}
+        data-selected={String(value === 'builder')}
         type="button"
-        onClick={() => onChange('badge')}
+        onClick={() => onChange('builder')}
       >
         BUILDER PASS
-        <span>for your timeline</span>
+        <span>Timeline Card</span>
+      </button>
+
+      <button
+        role="tab"
+        aria-selected={value === 'team'}
+        data-selected={String(value === 'team')}
+        type="button"
+        onClick={() => onChange('team')}
+      >
+        TEAM PASS
+        <span>3-up Frame</span>
       </button>
     </div>
   )
