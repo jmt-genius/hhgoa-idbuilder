@@ -15,13 +15,13 @@ export default function FrameInGoaPoster() {
           return;
         }
 
-        const containerWidth = containerRef.current.clientWidth;
+        const containerWidth = window.innerWidth;
         const containerHeight = window.innerHeight;
 
         // 1600x900 is the base size
         const scaleX = containerWidth / 1600;
         const scaleY = containerHeight / 900;
-        const scale = Math.min(scaleX, scaleY, 1);
+        const scale = Math.min(scaleX, scaleY);
 
         posterRef.current.style.setProperty('--scale', scale.toString());
       }
@@ -61,8 +61,10 @@ export default function FrameInGoaPoster() {
 
         {/* headline */}
         <div className="headline">
-          <span className="word frame">FRAME</span>
-          <span className="word in">IN</span>
+          <div className="headline-row">
+            <span className="word frame">FRAME</span>
+            <span className="word in">IN</span>
+          </div>
           <span className="word goa">GOA</span>
         </div>
 
