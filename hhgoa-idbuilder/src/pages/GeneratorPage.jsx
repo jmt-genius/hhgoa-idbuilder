@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import Header from '../components/Header'
+import TacticalMapBackground from '../components/TacticalMapBackground'
 import Footer from '../components/Footer'
-import SideRails from '../components/SideRails'
 import FormatSelector from '../components/FormatSelector'
 import PfpGenerator from '../components/PfpGenerator'
 
@@ -10,10 +9,9 @@ export default function GeneratorPage() {
 
   return (
     <>
-      <SideRails />
+      <TacticalMapBackground />
 
       <main
-        className="field-texture"
         style={{
           position: 'relative',
           zIndex: 10,
@@ -21,12 +19,10 @@ export default function GeneratorPage() {
           flexDirection: 'column',
           alignItems: 'center',
           minHeight: '100dvh',
-          padding: '40px 20px 64px',
+          padding: '100px 20px 64px',
         }}
       >
-        <Header />
-
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '32px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '28px', width: '100%' }}>
           {/* Format selector */}
           <FormatSelector value={format} onChange={setFormat} />
 

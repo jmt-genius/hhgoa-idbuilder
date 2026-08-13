@@ -29,7 +29,7 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--brand-primary);
+  background: #051a0e;
   color: var(--brand-offwhite);
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   -webkit-font-smoothing: antialiased;
@@ -288,8 +288,12 @@ body {
   width: 100%;
   max-width: 36rem;
   border-radius: 9999px;
-  border: 2px solid rgba(154, 201, 95, 0.4);
+  border: 1.5px solid rgba(154, 201, 95, 0.35);
+  background: rgba(5, 22, 13, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 .tab-toggle-shadow {
@@ -700,10 +704,13 @@ body {
 }
 
 .panel {
-  background: linear-gradient(180deg, var(--brand-night), #0a1a11);
-  border: 2px solid rgba(154, 201, 95, 0.25);
+  background: rgba(5, 22, 13, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(154, 201, 95, 0.25);
   border-radius: 16px;
   padding: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
 /* ── Landing Page Styles ── */

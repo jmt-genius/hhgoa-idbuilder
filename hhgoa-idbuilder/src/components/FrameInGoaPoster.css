@@ -335,17 +335,18 @@
   color: var(--yellow);
 }
 
-/* ---------- CREATE button ---------- */
+/* ---------- CREATE button (Top Right) ---------- */
 .create-btn {
   position: absolute;
-  bottom: 32px;
-  right: 44px;
-  width: 300px;
-  height: 70px;
+  top: 36px;
+  right: 32px;
+  width: 250px;
+  height: 58px;
   cursor: pointer;
   border: none;
   background: transparent;
   padding: 0;
+  z-index: 15;
 }
 
 .create-btn:hover .face {
