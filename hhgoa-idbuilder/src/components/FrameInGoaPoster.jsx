@@ -36,13 +36,17 @@ export default function FrameInGoaPoster() {
         <div className="cross bl pink"></div>
         <div className="cross br"></div>
         <div className="cross mid-right"></div>
-        {/* Top-left Branding Group (2:47 Studio + Hacker House Goa) */}
+        {/* Top-left Branding Group (2:47 Studio + Hacker House Goa + Event Info) */}
         <div className="top-left-branding">
           <img src="/custom-logo.svg" className="custom-logo" alt="2:47 Studio" />
           <div className="hh-horizontal-logo">
             <span className="hh-word font-display">HACKER</span>
             <img src="/goa-devanagari.png" className="devanagari-logo-inline" alt="Goa Devanagari" />
             <span className="hh-word font-display">HOUSE</span>
+          </div>
+          <div className="top-event-info">
+            <span className="top-event-dates">28TH – 31ST OCT 2026</span>
+            <span className="top-event-loc">GOA, INDIA</span>
           </div>
         </div>
 
@@ -57,23 +61,14 @@ export default function FrameInGoaPoster() {
           <span className="word goa">GOA</span>
         </div>
 
-        <div className="tagline">
-          MAKE YOUR MARK<br />IN GOA.
-        </div>
-
-        {/* location / date info */}
-        <div className="info-block">
-          <div className="row"><span className="icon">&#128205;</span><span>GOA, INDIA</span></div>
-          <div className="row"><span className="icon">&#128197;</span><span>28 &ndash; 31 OCT 2026</span></div>
-          <div className="row"><span className="icon tag">#</span><span>#FrameInGoa</span></div>
-        </div>
-
         <div className="bottom-rule"></div>
 
         <div className="bottom-bar">
           <span className="built">BUILT FOR BUILDERS</span>
           <span className="divider"></span>
           <span className="coords"><span className="globe">&#127760;</span>15.2993&deg; N, 74.1240&deg; E</span>
+          <span className="divider"></span>
+          <span className="tagline-bottom">MAKE YOUR MARK IN GOA.</span>
         </div>
 
         <button className="create-btn" onClick={() => navigate('/create')}>
