@@ -1,0 +1,270 @@
+/* ── Tactical Map Background Styles ── */
+.tactical-bg-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: 
+    radial-gradient(ellipse at 8% 6%, rgba(254, 225, 1, 0.16) 0%, rgba(244, 201, 60, 0.04) 35%, transparent 65%),
+    radial-gradient(circle at 78% 16%, rgba(154, 201, 95, 0.10) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 100%, rgba(13, 31, 18, 0.8) 0%, transparent 60%),
+    linear-gradient(180deg, #051a0e 0%, #082415 50%, #031208 100%);
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Atmospheric Glows */
+.tactical-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.tactical-glow.top-left {
+  top: -80px;
+  left: -80px;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(254, 225, 1, 0.22) 0%, rgba(254, 225, 1, 0) 70%);
+}
+
+.tactical-glow.top-right {
+  top: -40px;
+  right: 10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(154, 201, 95, 0.12) 0%, transparent 70%);
+}
+
+.tactical-glow.bottom-center {
+  bottom: -100px;
+  left: 20%;
+  width: 60%;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(154, 201, 95, 0.06) 0%, transparent 70%);
+}
+
+/* Crosshairs Grid */
+.crosshairs-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(154, 201, 95, 0.35);
+  line-height: 1;
+}
+
+.crosshairs-layer .ch {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+/* Full SVG Map */
+.tactical-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Radar rings */
+.radar-ring {
+  fill: none;
+  stroke: rgba(154, 201, 95, 0.22);
+  stroke-width: 1px;
+}
+
+.radar-ring.faint {
+  stroke: rgba(154, 201, 95, 0.12);
+}
+
+.radar-sweep-line {
+  stroke: rgba(154, 201, 95, 0.45);
+  stroke-width: 1.2px;
+  stroke-dasharray: 4 2;
+}
+
+.radar-sweep-group {
+  transform-origin: 1250px 140px;
+  animation: radar-sweep 18s linear infinite;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Coastline Vector */
+.coastline-path {
+  fill: none;
+  stroke: rgba(154, 201, 95, 0.45);
+  stroke-width: 1.8px;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 4px rgba(154, 201, 95, 0.25));
+}
+
+/* Trajectory Arcs */
+.trajectory-arc {
+  fill: none;
+  stroke: rgba(244, 201, 60, 0.35);
+  stroke-width: 1.2px;
+  stroke-dasharray: 4 4;
+}
+
+/* Telemetry Nodes & Ripple Pulses */
+.node-ring {
+  fill: none;
+  stroke: rgba(244, 201, 60, 0.35);
+  stroke-width: 1px;
+}
+
+.node-ring-pink {
+  fill: none;
+  stroke: rgba(255, 47, 126, 0.45);
+  stroke-width: 1px;
+}
+
+.pulse-1 {
+  animation: node-pulse 3.2s ease-out infinite;
+}
+
+.pulse-2 {
+  animation: node-pulse 3.2s ease-out infinite 1.1s;
+}
+
+.pulse-3 {
+  animation: node-pulse 3.2s ease-out infinite 2.2s;
+}
+
+@keyframes node-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Telemetry Labels */
+.node-label {
+  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  fill: #f4c93c;
+  letter-spacing: 0.08em;
+}
+
+.node-label.faint {
+  fill: rgba(154, 201, 95, 0.65);
+  font-size: 10px;
+}
+
+.node-label-pink {
+  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  fill: #ff2f7e;
+  letter-spacing: 0.08em;
+}
+
+.node-label-pink.faint {
+  fill: rgba(255, 47, 126, 0.7);
+  font-size: 10px;
+}
+
+/* ── Top-Left Branding ── */
+.top-branding-left {
+  position: absolute;
+  top: 28px;
+  left: 40px;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+.branding-logo-left {
+  height: 52px;
+  width: auto;
+  filter: drop-shadow(0 0 12px rgba(254, 225, 1, 0.35));
+}
+
+/* ── Top-Right Branding ── */
+.top-branding-right {
+  position: absolute;
+  top: 28px;
+  right: 48px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: auto;
+}
+
+.hh-badge-lockup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hh-brand-title {
+  font-family: 'Imbue', Georgia, serif;
+  font-variation-settings: 'opsz' 100;
+  font-weight: 800;
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: #f4c93c;
+}
+
+.hh-brand-devanagari {
+  height: 28px;
+  width: auto;
+}
+
+.hh-brand-subrule {
+  width: 100%;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(244, 201, 60, 0.35);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hh-brand-year {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: #f4c93c;
+  opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+  .top-branding-left {
+    top: 18px;
+    left: 20px;
+  }
+  .branding-logo-left {
+    height: 38px;
+  }
+  .top-branding-right {
+    top: 18px;
+    right: 20px;
+  }
+  .hh-brand-title {
+    font-size: 22px;
+  }
+  .hh-brand-devanagari {
+    height: 20px;
+  }
+}
