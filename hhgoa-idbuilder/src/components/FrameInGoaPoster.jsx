@@ -36,26 +36,17 @@ export default function FrameInGoaPoster() {
         <div className="cross bl pink"></div>
         <div className="cross br"></div>
         <div className="cross mid-right"></div>
-        {/* Top-left Branding Group */}
+        {/* Top-left Branding Group (2:47 Studio + Hacker House Goa) */}
         <div className="top-left-branding">
-          <img src="/custom-logo.svg" className="custom-logo" alt="Goa Palm Trees" />
-        </div>
-
-        {/* Top-right Hacker House Logo */}
-        <div className="top-right-branding">
-          <div className="hh-stacked-text">
+          <img src="/custom-logo.svg" className="custom-logo" alt="2:47 Studio" />
+          <div className="hh-horizontal-logo">
             <span className="hh-word font-display">HACKER</span>
+            <img src="/goa-devanagari.png" className="devanagari-logo-inline" alt="Goa Devanagari" />
             <span className="hh-word font-display">HOUSE</span>
-            <img src="/goa-devanagari.png" className="devanagari-logo" alt="Goa Devanagari" />
           </div>
         </div>
 
-        <div className="top-x">&times;</div>
 
-        <div className="top-labels">
-          <span className="l1">HH&#8209;GOA / 26</span>
-          <span className="l2">FRAME SYSTEM / 01</span>
-        </div>
 
         <div className="top-rule"></div>
 
