@@ -14,6 +14,16 @@ export default function PfpGenerator() {
   const [zoom, setZoom] = useState(100)
   const [showBadge, setShowBadge] = useState(true)
 
+  // AI Feature States
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [presets] = useState([
+    "ghibli", "indian_cinema", "jojo_anime", "cyberpunk", "watercolor", 
+    "oil_painting", "pixel_art", "film_noir", "vintage_polaroid", "vaporwave"
+  ])
+  const [selectedPreset, setSelectedPreset] = useState('original')
+  const [isAIGenerating, setIsAIGenerating] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('')
+
   const [isProcessing, setIsProcessing] = useState(false)
   const canvasRef = useRef(null)
   const goaBadgeRef = useRef(null)
@@ -40,10 +50,12 @@ export default function PfpGenerator() {
   const handleImageUpload = useCallback(async (file) => {
     try {
       let imageFile = file
+      setSelectedFile(file)
       if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
         setIsProcessing(true)
         imageFile = await convertHeicToPng(file)
         setIsProcessing(false)
+        setSelectedFile(imageFile)
       }
       const img = new Image()
       img.src = URL.createObjectURL(imageFile)
@@ -52,10 +64,71 @@ export default function PfpGenerator() {
         img.onerror = reject
       })
       setOriginalImage(img)
+      setSelectedPreset('original')
     } catch (err) {
       console.error(err)
     }
   }, [])
+
+  const pollStatus = async (runId) => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/status/${runId}`)
+      const data = await res.json()
+      if (data.status === 'success' && data.image_url) {
+        const img = new Image()
+        // We set crossOrigin to anonymous to avoid tainted canvas on download
+        img.crossOrigin = 'anonymous'
+        img.src = data.image_url
+        await new Promise((resolve, reject) => {
+          img.onload = resolve
+          img.onerror = reject
+        })
+        setOriginalImage(img)
+        setIsAIGenerating(false)
+        setStatusMessage('Generation complete!')
+        setTimeout(() => setStatusMessage(''), 3000)
+      } else if (data.status === 'failed') {
+        setIsAIGenerating(false)
+        setStatusMessage('Generation failed.')
+      } else {
+        setTimeout(() => pollStatus(runId), 3000)
+      }
+    } catch (e) {
+      console.error(e)
+      setIsAIGenerating(false)
+      setStatusMessage('Error checking status.')
+    }
+  }
+
+  const handleGenerateStyle = async () => {
+    if (!selectedFile || selectedPreset === 'original') return
+    
+    setIsAIGenerating(true)
+    setStatusMessage('Uploading image...')
+    
+    const formData = new FormData()
+    formData.append('file', selectedFile)
+    formData.append('preset', selectedPreset)
+    
+    try {
+      const res = await fetch('http://localhost:8000/api/generate', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      
+      if (res.ok && data.run_id) {
+        setStatusMessage('✨ Generating your style... Please wait...')
+        pollStatus(data.run_id)
+      } else {
+        throw new Error(data.detail || 'Failed to start generation')
+      }
+    } catch (e) {
+      console.error(e)
+      setIsAIGenerating(false)
+      setStatusMessage('Failed to connect to AI server.')
+    }
+  }
 
   const generateImage = useCallback(() => {
     if (!originalImage) return
@@ -159,6 +232,12 @@ export default function PfpGenerator() {
             onDownload={handleDownload}
             onShare={handleShare}
             isProcessing={isProcessing}
+            presets={presets}
+            selectedPreset={selectedPreset}
+            onPresetChange={setSelectedPreset}
+            onGenerateStyle={handleGenerateStyle}
+            isAIGenerating={isAIGenerating}
+            statusMessage={statusMessage}
           />
         )}
       </div>

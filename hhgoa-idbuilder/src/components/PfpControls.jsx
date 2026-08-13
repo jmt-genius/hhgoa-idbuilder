@@ -65,6 +65,12 @@ export default function PfpControls({
   onDownload,
   onShare,
   isProcessing,
+  presets,
+  selectedPreset,
+  onPresetChange,
+  onGenerateStyle,
+  isAIGenerating,
+  statusMessage,
 }) {
   return (
     <div className="reveal-panel" style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', maxWidth: '440px' }}>
@@ -178,6 +184,80 @@ export default function PfpControls({
           Change Photo
         </button>
       </div>
+
+      {/* AI Style Option */}
+      {presets && presets.length > 0 && (
+        <div style={{
+          background: 'rgba(10, 26, 17, 0.8)',
+          border: '1px solid var(--brand-border)',
+          borderRadius: '10px',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          <div className="section-label" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: 'var(--brand-pink)' }}>✦</span> AI STYLE
+          </div>
+          <select
+            value={selectedPreset}
+            onChange={(e) => onPresetChange(e.target.value)}
+            disabled={isAIGenerating}
+            style={{
+              width: '100%',
+              background: 'rgba(8, 26, 16, 0.9)',
+              border: '1px solid var(--brand-border)',
+              borderRadius: '6px',
+              padding: '8px 12px',
+              color: 'var(--text-primary)',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '13px',
+              outline: 'none',
+              transition: 'all 0.2s',
+            }}
+          >
+            <option value="original">Original Photo</option>
+            {presets.map(p => (
+              <option key={p} value={p}>{p.replace(/_/g, ' ').toUpperCase()}</option>
+            ))}
+          </select>
+          
+          {selectedPreset !== 'original' && (
+            <button
+              onClick={onGenerateStyle}
+              disabled={isAIGenerating}
+              style={{
+                width: '100%',
+                padding: '10px 16px',
+                borderRadius: '6px',
+                border: 'none',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontWeight: 'bold',
+                fontSize: '12px',
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                cursor: isAIGenerating ? 'not-allowed' : 'pointer',
+                background: isAIGenerating ? 'rgba(30, 58, 40, 0.8)' : 'var(--brand-pink)',
+                color: isAIGenerating ? '#7fae8d' : '#ffffff',
+                transition: 'all 0.1s',
+              }}
+            >
+              {isAIGenerating ? 'Generating...' : 'Apply AI Style'}
+            </button>
+          )}
+          {statusMessage && (
+            <div style={{
+              fontSize: '11px',
+              color: 'var(--brand-accent)',
+              textAlign: 'center',
+              animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+            }}>
+              {statusMessage}
+            </div>
+          )}
+        </div>
+      )}
+
 
       {/* Download + Share */}
       <div style={{ display: 'flex', gap: '12px', flexDirection: 'column' }}>
