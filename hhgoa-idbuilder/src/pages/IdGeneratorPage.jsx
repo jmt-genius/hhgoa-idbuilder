@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ID_TEMPLATE } from '../assets/templates';
-import { convertHeicToPng } from '../utils/helpers';
+import { convertHeicToPng, generateShareUrl } from '../utils/helpers';
 
 const BASE_W = 1024, BASE_H = 1536;
 const PHOTO_BORDER = { left: 233, top: 452, right: 787, bottom: 1005 };
@@ -58,7 +58,7 @@ export default function IdGeneratorPage() {
   const [isCanvasDragging, setIsCanvasDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isProcessing, setIsProcessing] = useState(false);
-
+  const [templateReady, setTemplateReady] = useState(false);
 
   const canvasRef = useRef(null);
   const tplImgRef = useRef(null);
@@ -69,10 +69,10 @@ export default function IdGeneratorPage() {
     const img = new Image();
     img.onload = () => {
       tplImgRef.current = img;
-      drawCard();
+      setTemplateReady(true);
     };
     img.src = ID_TEMPLATE;
-  }, [drawCard]);
+  }, []);
 
   // Load user image when photoUrl changes
   useEffect(() => {
@@ -164,7 +164,7 @@ export default function IdGeneratorPage() {
       ctx.fillText(cleanTeam, cx, cy, maxW);
       ctx.restore();
     }
-  }, [userImg, name, team, zoom, rotation, panX, panY]);
+  }, [userImg, name, team, zoom, rotation, panX, panY, templateReady]);
 
   useEffect(() => {
     drawCard();
@@ -331,6 +331,11 @@ export default function IdGeneratorPage() {
     link.click();
   };
 
+  const handleShare = () => {
+    const text = "Just built my ID pass for Hacker House Goa 2026! 🌴💚 #FrameInGoa #HHGoa2026";
+    window.open(generateShareUrl(text), '_blank', 'width=550,height=420');
+  };
+
   const isReady = !!(userImg && name.trim().length > 0);
 
   return (
@@ -478,10 +483,21 @@ export default function IdGeneratorPage() {
 
             <button 
               onClick={handleDownload}
-              className="w-full py-[13px] px-4 rounded-lg border-none font-mono font-bold text-[13px] tracking-[1.5px] uppercase cursor-pointer transition-all duration-100 active:scale-95 bg-[#f6cf1f] text-[#101a10] hover:brightness-110"
+              disabled={!isReady}
+              className={`w-full py-[13px] px-4 rounded-lg border-none font-mono font-bold text-[13px] tracking-[1.5px] uppercase transition-all duration-100 active:scale-95 bg-[#f6cf1f] text-[#101a10] hover:brightness-110 ${isReady ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
             >
               Download ID Card
             </button>
+
+            {isReady && (
+              <button
+                onClick={handleShare}
+                className="w-full py-[11px] px-4 rounded-lg border-[1.5px] border-[rgba(154,201,95,0.3)] bg-transparent text-[#eaf5ee] font-mono font-bold text-[13px] tracking-[1.5px] uppercase cursor-pointer mt-2.5 transition-all duration-150 hover:border-[#f6cf1f] hover:text-[#f6cf1f]"
+              >
+                Post to X
+              </button>
+            )}
+
             <button 
               onClick={handleReset}
               className="w-full py-[13px] px-4 rounded-lg font-mono font-bold text-[13px] tracking-[1.5px] uppercase cursor-pointer transition-all duration-100 active:scale-95 bg-transparent text-[#e8226f] border border-[#e8226f] mt-2.5 hover:bg-[#e8226f]/10"
@@ -497,7 +513,7 @@ export default function IdGeneratorPage() {
           <div className="flex flex-col items-center gap-[18px]">
             <div className="flex gap-2 items-center text-[11px] text-[#7fae8d] tracking-[1px] uppercase">
               <span className={`w-[7px] h-[7px] rounded-full transition-colors ${isReady ? 'bg-[#3ee089] shadow-[0_0_8px_#3ee089]' : 'bg-[#e8226f] shadow-[0_0_8px_#e8226f]'}`}></span>
-              <span>{isReady ? 'Pass ready — download it below' : 'Waiting for photo & name'}</span>
+              <span>{isReady ? 'Pass ready — download it below' : templateReady ? 'Frame preview — add photo & name' : 'Loading frame…'}</span>
             </div>
             <div 
               className="relative w-full flex justify-center [perspective:1000px]" 
@@ -510,7 +526,11 @@ export default function IdGeneratorPage() {
                 onMouseUp={handleCanvasMouseUp}
                 onMouseLeave={handleCanvasMouseUp}
                 className="w-full max-w-[440px] h-auto rounded-[18px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] block [transform-style:preserve-3d] transition-all duration-150 hover:shadow-[0_45px_80px_-20px_rgba(0,0,0,0.85),0_0_40px_rgba(246,207,31,0.15)]"
-                style={{ cursor: isCanvasDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
+                style={{
+                  cursor: userImg ? (isCanvasDragging ? 'grabbing' : 'grab') : 'default',
+                  touchAction: 'none',
+                  aspectRatio: `${BASE_W} / ${BASE_H}`,
+                }}
               ></canvas>
             </div>
           </div>

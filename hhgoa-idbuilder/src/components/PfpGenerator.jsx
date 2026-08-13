@@ -49,6 +49,7 @@ export default function PfpGenerator() {
   const goaBadgeRef = useRef(null)
   const pfpFrameRef = useRef(null)
   const fileInputRef = useRef(null)
+  const [frameAssetsReady, setFrameAssetsReady] = useState(false)
 
   // Load goa badge image and pfp frame overlay
   useEffect(() => {
@@ -58,13 +59,33 @@ export default function PfpGenerator() {
 
     const frame = new Image()
     frame.src = '/pfp_overlay.png'
-    frame.onload = () => { pfpFrameRef.current = frame }
+    frame.onload = () => {
+      pfpFrameRef.current = frame
+      setFrameAssetsReady(true)
+    }
   }, [])
 
-  // Auto-generate on any control change
-  useEffect(() => {
-    if (originalImage) generateImage()
+  const generateImage = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    const dpr = 2
+    const width = 800
+    const height = 800
+    canvas.width = width * dpr
+    canvas.height = height * dpr
+    ctx.scale(dpr, dpr)
+    const processedImage = originalImage ? applyPhotoLook(originalImage, photoLook) : null
+    drawPfpFrame(ctx, width, height, processedImage, {
+      ringColor, zoom: zoom / 100, rotation, panX, panY, showBadge,
+      goaBadge: goaBadgeRef.current, pfpFrame: pfpFrameRef.current,
+    })
   }, [originalImage, ringColor, photoLook, zoom, rotation, panX, panY, showBadge])
+
+  // Redraw preview whenever controls or frame assets change
+  useEffect(() => {
+    if (frameAssetsReady) generateImage()
+  }, [frameAssetsReady, generateImage])
 
   const handleImageUpload = useCallback(async (file) => {
     if (!file || !file.type.startsWith('image/')) return
@@ -85,7 +106,6 @@ export default function PfpGenerator() {
         img.onerror = reject
       })
       setOriginalImage(img)
-      setOriginalImage(img)
       setPanX(0)
       setPanY(0)
       setRotation(0)
@@ -95,25 +115,6 @@ export default function PfpGenerator() {
       setIsProcessing(false)
     }
   }, [])
-
-  const generateImage = useCallback(() => {
-    if (!originalImage) return
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    const dpr = 2 // Fixed 2x for quality
-    const width = 800
-    const height = 800
-    canvas.width = width * dpr
-    canvas.height = height * dpr
-    ctx.scale(dpr, dpr)
-    // Apply photo look
-    const processedImage = applyPhotoLook(originalImage, photoLook)
-    drawPfpFrame(ctx, width, height, processedImage, {
-      ringColor, zoom: zoom / 100, rotation, panX, panY, showBadge,
-      goaBadge: goaBadgeRef.current, pfpFrame: pfpFrameRef.current,
-    })
-  }, [originalImage, ringColor, photoLook, zoom, rotation, panX, panY, showBadge])
 
   const handleDownload = useCallback(async () => {
     const canvas = canvasRef.current
@@ -273,7 +274,6 @@ export default function PfpGenerator() {
                 const file = e.dataTransfer.files?.[0]
                 if (file) await handleImageUpload(file)
               }}
-              onClick={() => fileInputRef.current?.click()}
             >
               {originalImage && (
                 <canvas
@@ -510,53 +510,33 @@ export default function PfpGenerator() {
               background: isReady ? '#3ee089' : '#e8226f',
               boxShadow: isReady ? '0 0 8px #3ee089' : '0 0 8px #e8226f',
             }} />
-            <span>{isReady ? 'Ready to download' : 'Waiting for photo'}</span>
+            <span>{isReady ? 'Ready to download' : 'Frame preview — upload a photo'}</span>
           </div>
 
-          {/* Canvas / placeholder */}
+          {/* Canvas preview — frame visible even before photo upload */}
           <div style={{ position: 'relative', width: '100%', display: 'flex', justifyContent: 'center' }}>
             <CardContainer containerClassName="py-0 flex justify-center w-full">
               <CardBody className="[transform-style:preserve-3d] w-full h-auto flex items-center justify-center">
                 <CardItem translateZ="100" className="w-full flex justify-center">
-                  {originalImage ? (
-                    <canvas
-                      ref={canvasRef}
-                      onMouseDown={handleCanvasMouseDown}
-                      onMouseMove={handleCanvasMouseMove}
-                      onMouseUp={handleCanvasMouseUp}
-                      onMouseLeave={handleCanvasMouseUp}
-                      style={{
-                        width: '100%',
-                        maxWidth: '440px',
-                        height: 'auto',
-                        borderRadius: '18px',
-                        boxShadow: '0 30px 60px -20px rgba(0,0,0,0.7)',
-                        display: 'block',
-                        cursor: isCanvasDragging ? 'grabbing' : 'grab',
-                        touchAction: 'none'
-                      }}
-                      aria-label="Generated PFP preview"
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: '100%',
-                        maxWidth: '440px',
-                        aspectRatio: '1',
-                        borderRadius: '18px',
-                        background: 'rgba(4, 23, 13, 0.5)',
-                        border: '2px dashed rgba(154, 201, 95, 0.15)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'rgba(255, 251, 232, 0.3)',
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '13px',
-                      }}
-                    >
-                      Preview Canvas
-                    </div>
-                  )}
+                  <canvas
+                    ref={canvasRef}
+                    onMouseDown={handleCanvasMouseDown}
+                    onMouseMove={handleCanvasMouseMove}
+                    onMouseUp={handleCanvasMouseUp}
+                    onMouseLeave={handleCanvasMouseUp}
+                    style={{
+                      width: '100%',
+                      maxWidth: '440px',
+                      height: 'auto',
+                      borderRadius: '18px',
+                      boxShadow: '0 30px 60px -20px rgba(0,0,0,0.7)',
+                      display: 'block',
+                      cursor: originalImage ? (isCanvasDragging ? 'grabbing' : 'grab') : 'default',
+                      touchAction: 'none',
+                      aspectRatio: '1',
+                    }}
+                    aria-label="PFP frame preview"
+                  />
                 </CardItem>
               </CardBody>
             </CardContainer>
@@ -709,31 +689,28 @@ function drawPfpFrame(ctx, width, height, image, opts) {
 
   ctx.clearRect(0, 0, width, height)
 
-  ctx.save()
-  ctx.beginPath()
-  ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2)
-  ctx.clip()
+  if (image) {
+    ctx.save()
+    ctx.beginPath()
+    ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2)
+    ctx.clip()
 
-  const imgAspect = image.width / image.height
-  let drawWidth, drawHeight
-  
-  if (imgAspect > 1) {
-    drawHeight = innerRadius * 2 * zoom
-    drawWidth = drawHeight * imgAspect
-  } else {
-    drawWidth = innerRadius * 2 * zoom
-    drawHeight = drawWidth / imgAspect
+    const imgAspect = image.width / image.height
+    let drawWidth, drawHeight
+
+    if (imgAspect > 1) {
+      drawHeight = innerRadius * 2 * zoom
+      drawWidth = drawHeight * imgAspect
+    } else {
+      drawWidth = innerRadius * 2 * zoom
+      drawHeight = drawWidth / imgAspect
+    }
+
+    ctx.translate(centerX + panX, centerY + panY)
+    ctx.rotate(rotation * Math.PI / 180)
+    ctx.drawImage(image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight)
+    ctx.restore()
   }
-
-  // Set origin to the calculated center including pan
-  ctx.translate(centerX + panX, centerY + panY)
-  // Apply rotation
-  ctx.rotate(rotation * Math.PI / 180)
-  
-  // Draw image centered at the new origin
-  ctx.drawImage(image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight)
-  
-  ctx.restore()
 
   if (pfpFrame) {
     let tintedFrame

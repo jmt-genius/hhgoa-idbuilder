@@ -682,8 +682,8 @@ let isDragging = false;
 let dragStart = {x:0, y:0};
 let dragMemberIndex = -1;
 
-cardCanvas.addEventListener('mousedown', (e) => {
-  const rect = cardCanvas.getBoundingClientRect();
+canvas.addEventListener('mousedown', (e) => {
+  const rect = canvas.getBoundingClientRect();
   const scale = BASE_W / rect.width;
   const x = (e.clientX - rect.left) * scale;
   const y = (e.clientY - rect.top) * scale;
@@ -692,7 +692,7 @@ cardCanvas.addEventListener('mousedown', (e) => {
   if(dragMemberIndex !== -1 && members[dragMemberIndex].img) {
     isDragging = true;
     dragStart = { x: e.clientX, y: e.clientY };
-    cardCanvas.style.cursor = 'grabbing';
+    canvas.style.cursor = 'grabbing';
   }
 });
 window.addEventListener('mousemove', (e) => {
@@ -709,7 +709,7 @@ window.addEventListener('mousemove', (e) => {
     if(angleSlider) angleSlider.value = m.rotation;
     if(angleVal) angleVal.textContent = Math.round(m.rotation) + '°';
   } else {
-    const displayWidth = cardCanvas.getBoundingClientRect().width;
+    const displayWidth = canvas.getBoundingClientRect().width;
     const scale = BASE_W / displayWidth;
     m.panX += dx * scale;
     m.panY += dy * scale;
@@ -721,7 +721,7 @@ window.addEventListener('mouseup', () => {
   if(isDragging) {
     isDragging = false;
     dragMemberIndex = -1;
-    cardCanvas.style.cursor = 'grab';
+    canvas.style.cursor = 'grab';
   }
 });
 
@@ -868,20 +868,19 @@ buildForm();
 
 // ── 3D Card Hover Effect ──
 const canvasShell = document.querySelector('.canvas-shell');
-const cardCanvas = document.getElementById('cardCanvas');
 
-if (canvasShell && cardCanvas) {
+if (canvasShell && canvas) {
   canvasShell.addEventListener('mousemove', (e) => {
     const rect = canvasShell.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
     const x = (e.clientX - rect.left - width / 2) / 30;
     const y = (e.clientY - rect.top - height / 2) / 30;
-    cardCanvas.style.transform = `rotateY(${x}deg) rotateX(${-y}deg) scale3d(1.03, 1.03, 1.03)`;
+    canvas.style.transform = `rotateY(${x}deg) rotateX(${-y}deg) scale3d(1.03, 1.03, 1.03)`;
   });
 
   canvasShell.addEventListener('mouseleave', () => {
-    cardCanvas.style.transform = 'rotateY(0deg) rotateX(0deg) scale3d(1, 1, 1)';
+    canvas.style.transform = 'rotateY(0deg) rotateX(0deg) scale3d(1, 1, 1)';
   });
 }
 </script>

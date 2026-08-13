@@ -43,17 +43,21 @@ export default function GeneratorPage() {
             <div style={{ width: '100%', maxWidth: '1380px' }}>
               <iframe
                 src="/hacker-house-goa-team-frame-generator-2-3.html"
-                scrolling="no"
                 style={{
                   width: '100%',
-                  height: '2000px',
+                  height: '1800px',
                   border: 'none',
                   borderRadius: '16px',
                   boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-                  background: 'rgba(7, 19, 12, 0.4)',
-                  overflow: 'hidden'
+                  display: 'block',
                 }}
                 title="Team Builder Pass Generator"
+                onLoad={(e) => {
+                  try {
+                    const h = e.target.contentDocument?.documentElement?.scrollHeight;
+                    if (h && h > 0) e.target.style.height = h + 'px';
+                  } catch(_) {}
+                }}
               />
             </div>
           )}
