@@ -233,6 +233,16 @@
     margin-top:10px;
   }
   .btn-ghost:hover{background:rgba(232,34,111,0.1);}
+  .btn-outline{
+    background:transparent;
+    color:#eaf5ee;
+    border:1.5px solid rgba(154,201,95,0.3);
+    margin-top:10px;
+  }
+  .btn-outline:hover{
+    border-color:var(--yellow);
+    color:var(--yellow);
+  }
 
   .hint{
     font-size:11px;
@@ -312,6 +322,7 @@
       <div id="membersWrap"></div>
 
       <button class="btn btn-primary" id="downloadBtn">Download Team Frame</button>
+      <button class="btn btn-outline" id="shareBtn">Share to X</button>
       <button class="btn btn-ghost" id="resetBtn">Reset</button>
 
       <div class="hint">
@@ -586,6 +597,12 @@ document.getElementById('downloadBtn').addEventListener('click', ()=>{
   link.download = `${fname}-frame.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
+});
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const text = "Just built our team frame for Hacker House Goa 2026! 🌴💚 #FrameInGoa #HHGoa2026";
+  const shareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(shareUrl, '_blank', 'width=550,height=420');
 });
 
 buildForm();

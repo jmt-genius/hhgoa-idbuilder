@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { ID_TEMPLATE } from '../assets/templates';
+import { convertHeicToPng } from '../utils/helpers';
 
 const BASE_W = 1024, BASE_H = 1536;
 const PHOTO_BORDER = { left: 233, top: 452, right: 787, bottom: 1005 };
@@ -51,6 +52,13 @@ export default function IdGeneratorPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
+  const [rotation, setRotation] = useState(0);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const [isCanvasDragging, setIsCanvasDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isProcessing, setIsProcessing] = useState(false);
+
 
   const canvasRef = useRef(null);
   const tplImgRef = useRef(null);
@@ -95,8 +103,23 @@ export default function IdGeneratorPage() {
       ctx.save();
       chamferPath(ctx, PHOTO_CLIP);
       ctx.clip();
-      const { dx, dy, dw, dh } = fitCover(userImg, PHOTO_CLIP, zoom / 100);
-      ctx.drawImage(userImg, dx, dy, dw, dh);
+      
+      const bw = PHOTO_CLIP.right - PHOTO_CLIP.left;
+      const bh = PHOTO_CLIP.bottom - PHOTO_CLIP.top;
+      const cx = PHOTO_CLIP.left + bw / 2;
+      const cy = PHOTO_CLIP.top + bh / 2;
+      
+      ctx.translate(cx + panX, cy + panY);
+      ctx.rotate(rotation * Math.PI / 180);
+      
+      const ir = userImg.width / userImg.height;
+      const br = bw / bh;
+      let dw, dh;
+      const z = zoom / 100;
+      if (ir > br) { dh = bh * z; dw = dh * ir; }
+      else { dw = bw * z; dh = dw / ir; }
+      
+      ctx.drawImage(userImg, -dw / 2, -dh / 2, dw, dh);
       ctx.restore();
     }
 
@@ -141,7 +164,7 @@ export default function IdGeneratorPage() {
       ctx.fillText(cleanTeam, cx, cy, maxW);
       ctx.restore();
     }
-  }, [userImg, name, team, zoom]);
+  }, [userImg, name, team, zoom, rotation, panX, panY]);
 
   useEffect(() => {
     drawCard();
@@ -174,17 +197,32 @@ export default function IdGeneratorPage() {
     };
   }, []);
 
-  const handleFile = (file) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    setSelectedFile(file);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setPhotoUrl(ev.target.result);
-      setFileName(file.name);
-      setZoom(100);
-      setSelectedPreset('original'); // reset preset on new photo
-    };
-    reader.readAsDataURL(file);
+  const handleFile = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/') && !file.name.toLowerCase().endsWith('.heic')) return;
+    try {
+      setIsProcessing(true);
+      let imageFile = file;
+      if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
+        imageFile = await convertHeicToPng(file);
+      }
+      setSelectedFile(imageFile);
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setPhotoUrl(ev.target.result);
+        setFileName(file.name);
+        setZoom(100);
+        setRotation(0);
+        setPanX(0);
+        setPanY(0);
+        setSelectedPreset('original'); // reset preset on new photo
+        setIsProcessing(false);
+      };
+      reader.readAsDataURL(imageFile);
+    } catch(err) {
+      console.error(err);
+      setIsProcessing(false);
+    }
   };
 
   const handleReset = () => {
@@ -192,11 +230,42 @@ export default function IdGeneratorPage() {
     setTeam('');
     setPhotoUrl('');
     setZoom(100);
+    setRotation(0);
+    setPanX(0);
+    setPanY(0);
     setFileName('');
     setSelectedFile(null);
     setSelectedPreset('original');
     setIsGenerating(false);
     setStatusMessage('');
+  };
+
+  const handleCanvasMouseDown = (e) => {
+    if (!userImg) return;
+    setIsCanvasDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleCanvasMouseMove = (e) => {
+    if (!isCanvasDragging || !userImg) return;
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    
+    // Scale adjustment based on rendered canvas size vs actual canvas size
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scale = rect.width / BASE_W;
+    
+    if (e.shiftKey) {
+      setRotation(prev => prev + dx * 0.5);
+    } else {
+      setPanX(prev => prev + dx / scale);
+      setPanY(prev => prev + dy / scale);
+    }
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleCanvasMouseUp = () => {
+    setIsCanvasDragging(false);
   };
 
   const pollStatus = async (runId) => {
@@ -300,27 +369,44 @@ export default function IdGeneratorPage() {
                 <div className={`text-[13px] mb-1 ${photoUrl ? 'text-[#f6cf1f]' : 'text-[#eaf5ee]'}`}>
                   {fileName ? (fileName.length > 28 ? fileName.slice(0, 25) + '…' : fileName) : 'Click or drop a photo'}
                 </div>
-                <div className="text-[11px] text-[#7fae8d]">JPG or PNG, square photos work best</div>
+                <div className="text-[11px] text-[#7fae8d]">
+                  {isProcessing ? 'Processing...' : 'JPG · PNG · HEIC · WEBP'}
+                </div>
                 <input 
                   type="file" 
-                  accept="image/*" 
+                  accept="image/*,.heic,.heif" 
                   className="absolute inset-0 opacity-0 cursor-pointer"
                   onChange={(e) => handleFile(e.target.files?.[0])}
+                  disabled={isProcessing}
                 />
               </div>
               
               {photoUrl && (
-                <div className="flex items-center gap-2.5 mt-1">
-                  <label className="m-0 whitespace-nowrap text-[11px] tracking-[1.5px] uppercase text-[#7fae8d]">Zoom</label>
-                  <input 
-                    type="range" 
-                    min="100" 
-                    max="220" 
-                    value={zoom} 
-                    onChange={(e) => setZoom(e.target.value)}
-                    className="flex-1 accent-[#f6cf1f]" 
-                  />
-                  <span className="text-[11px] text-[#7fae8d] w-9 text-right">{zoom}%</span>
+                <div className="flex flex-col gap-2 mt-3">
+                  <div className="flex items-center gap-2.5">
+                    <label className="m-0 whitespace-nowrap text-[11px] tracking-[1.5px] uppercase text-[#7fae8d] w-[45px]">Zoom</label>
+                    <input 
+                      type="range" 
+                      min="50" 
+                      max="300" 
+                      value={zoom} 
+                      onChange={(e) => setZoom(e.target.value)}
+                      className="flex-1 accent-[#f6cf1f]" 
+                    />
+                    <span className="text-[11px] text-[#7fae8d] w-9 text-right">{zoom}%</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <label className="m-0 whitespace-nowrap text-[11px] tracking-[1.5px] uppercase text-[#7fae8d] w-[45px]">Angle</label>
+                    <input 
+                      type="range" 
+                      min="-180" 
+                      max="180" 
+                      value={rotation} 
+                      onChange={(e) => setRotation(e.target.value)}
+                      className="flex-1 accent-[#f6cf1f]" 
+                    />
+                    <span className="text-[11px] text-[#7fae8d] w-9 text-right">{rotation}°</span>
+                  </div>
                 </div>
               )}
             </div>
@@ -404,7 +490,7 @@ export default function IdGeneratorPage() {
             </button>
 
             <div className="text-[11px] text-[#7fae8d] leading-relaxed mt-4 pt-3.5 border-t border-dashed border-[#1e3a28]">
-              <b className="text-[#eaf5ee]">Tip:</b> use the zoom slider to reposition your photo once it's uploaded — drag isn't needed, the photo auto-centers and crops to fit the frame.
+              <b className="text-[#eaf5ee]">Tip:</b> drag the photo in the preview to align it, or hold Shift to rotate!
             </div>
           </div>
 
@@ -419,7 +505,12 @@ export default function IdGeneratorPage() {
             >
               <canvas 
                 ref={canvasRef}
+                onMouseDown={handleCanvasMouseDown}
+                onMouseMove={handleCanvasMouseMove}
+                onMouseUp={handleCanvasMouseUp}
+                onMouseLeave={handleCanvasMouseUp}
                 className="w-full max-w-[440px] h-auto rounded-[18px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] block [transform-style:preserve-3d] transition-all duration-150 hover:shadow-[0_45px_80px_-20px_rgba(0,0,0,0.85),0_0_40px_rgba(246,207,31,0.15)]"
+                style={{ cursor: isCanvasDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
               ></canvas>
             </div>
           </div>

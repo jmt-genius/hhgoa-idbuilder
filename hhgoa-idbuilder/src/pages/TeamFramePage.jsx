@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { TEAM_TEMPLATE } from '../assets/templates';
+import { convertHeicToPng } from '../utils/helpers';
 
 const BASE_W = 1448, BASE_H = 1086;
 
@@ -51,10 +52,13 @@ function fitCover(img, box, zoom) {
 export default function TeamFramePage() {
   const [teamName, setTeamName] = useState('');
   const [members, setMembers] = useState([
-    { photoUrl: '', fileName: '', zoom: 100, name: '', role: '', img: null, isDragging: false },
-    { photoUrl: '', fileName: '', zoom: 100, name: '', role: '', img: null, isDragging: false },
-    { photoUrl: '', fileName: '', zoom: 100, name: '', role: '', img: null, isDragging: false }
+    { photoUrl: '', fileName: '', zoom: 100, rotation: 0, panX: 0, panY: 0, name: '', role: '', img: null, isDragging: false },
+    { photoUrl: '', fileName: '', zoom: 100, rotation: 0, panX: 0, panY: 0, name: '', role: '', img: null, isDragging: false },
+    { photoUrl: '', fileName: '', zoom: 100, rotation: 0, panX: 0, panY: 0, name: '', role: '', img: null, isDragging: false }
   ]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [draggedMemberIndex, setDraggedMemberIndex] = useState(-1);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const canvasRef = useRef(null);
   const tplImgRef = useRef(null);
@@ -130,8 +134,23 @@ export default function TeamFramePage() {
         ctx.save();
         chamferPath(ctx, slot.photo);
         ctx.clip();
-        const { dx, dy, dw, dh } = fitCover(m.img, slot.photo, m.zoom / 100);
-        ctx.drawImage(m.img, dx, dy, dw, dh);
+        
+        const bw = slot.photo.right - slot.photo.left;
+        const bh = slot.photo.bottom - slot.photo.top;
+        const cx = slot.photo.left + bw / 2;
+        const cy = slot.photo.top + bh / 2;
+        
+        ctx.translate(cx + m.panX, cy + m.panY);
+        ctx.rotate(m.rotation * Math.PI / 180);
+        
+        const ir = m.img.width / m.img.height;
+        const br = bw / bh;
+        let dw, dh;
+        const z = m.zoom / 100;
+        if (ir > br) { dh = bh * z; dw = dh * ir; }
+        else { dw = bw * z; dh = dw / ir; }
+        
+        ctx.drawImage(m.img, -dw / 2, -dh / 2, dw, dh);
         ctx.restore();
       }
       drawText(ctx, slot.name, m.name, '#d7e02b', 800, 22);
@@ -176,31 +195,84 @@ export default function TeamFramePage() {
     setMembers(newMembers);
   };
 
-  const handleFile = (i, file) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new Image();
-      img.onload = () => {
-        const newMembers = [...members];
-        newMembers[i].img = img;
-        newMembers[i].photoUrl = ev.target.result;
-        newMembers[i].fileName = file.name;
-        newMembers[i].zoom = 100;
-        setMembers(newMembers);
+  const handleFile = async (i, file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/') && !file.name.toLowerCase().endsWith('.heic')) return;
+    try {
+      setIsProcessing(true);
+      let imageFile = file;
+      if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
+        imageFile = await convertHeicToPng(file);
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const newMembers = [...members];
+          newMembers[i].img = img;
+          newMembers[i].photoUrl = ev.target.result;
+          newMembers[i].fileName = file.name;
+          newMembers[i].zoom = 100;
+          newMembers[i].rotation = 0;
+          newMembers[i].panX = 0;
+          newMembers[i].panY = 0;
+          setMembers(newMembers);
+          setIsProcessing(false);
+        };
+        img.src = ev.target.result;
       };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(imageFile);
+    } catch(err) {
+      console.error(err);
+      setIsProcessing(false);
+    }
   };
 
   const handleReset = () => {
     setTeamName('');
     setMembers([
-      { photoUrl: '', fileName: '', zoom: 100, name: '', role: '', img: null, isDragging: false },
-      { photoUrl: '', fileName: '', zoom: 100, name: '', role: '', img: null, isDragging: false },
-      { photoUrl: '', fileName: '', zoom: 100, name: '', role: '', img: null, isDragging: false }
+      { photoUrl: '', fileName: '', zoom: 100, rotation: 0, panX: 0, panY: 0, name: '', role: '', img: null, isDragging: false },
+      { photoUrl: '', fileName: '', zoom: 100, rotation: 0, panX: 0, panY: 0, name: '', role: '', img: null, isDragging: false },
+      { photoUrl: '', fileName: '', zoom: 100, rotation: 0, panX: 0, panY: 0, name: '', role: '', img: null, isDragging: false }
     ]);
+  };
+
+  const handleCanvasMouseDown = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scale = rect.width / BASE_W;
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / scale;
+    
+    const idx = SLOTS.findIndex(slot => 
+      x >= slot.photo.left && x <= slot.photo.right &&
+      y >= slot.photo.top && y <= slot.photo.bottom
+    );
+    if (idx !== -1 && members[idx].img) {
+      setDraggedMemberIndex(idx);
+      setDragStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleCanvasMouseMove = (e) => {
+    if (draggedMemberIndex === -1) return;
+    const m = members[draggedMemberIndex];
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scale = rect.width / BASE_W;
+
+    if (e.shiftKey) {
+      updateMember(draggedMemberIndex, 'rotation', m.rotation + dx * 0.5);
+    } else {
+      updateMember(draggedMemberIndex, 'panX', m.panX + dx / scale);
+      updateMember(draggedMemberIndex, 'panY', m.panY + dy / scale);
+    }
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+
+  const handleCanvasMouseUp = () => {
+    setDraggedMemberIndex(-1);
   };
 
   const handleDownload = () => {
@@ -272,26 +344,43 @@ export default function TeamFramePage() {
                       <div className={`text-[12px] mb-0.5 ${m.photoUrl ? 'text-[#d7e02b]' : 'text-[#eaf5ee]'}`}>
                         {m.fileName ? (m.fileName.length > 22 ? m.fileName.slice(0, 19) + '…' : m.fileName) : 'Click or drop a photo'}
                       </div>
-                      <div className="text-[10px] text-[#7fae8d]">JPG or PNG</div>
+                      <div className="text-[10px] text-[#7fae8d]">
+                        {isProcessing ? 'Processing...' : 'JPG · PNG · HEIC'}
+                      </div>
                       <input 
                         type="file" 
-                        accept="image/*" 
+                        accept="image/*,.heic,.heif" 
                         className="absolute inset-0 opacity-0 cursor-pointer"
                         onChange={(e) => handleFile(i, e.target.files?.[0])}
+                        disabled={isProcessing}
                       />
                     </div>
                     {m.photoUrl && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <label className="m-0 whitespace-nowrap text-[11px] tracking-[1.5px] uppercase text-[#7fae8d]">Zoom</label>
-                        <input 
-                          type="range" 
-                          min="100" 
-                          max="220" 
-                          value={m.zoom} 
-                          onChange={(e) => updateMember(i, 'zoom', e.target.value)}
-                          className="flex-1 accent-[#d7e02b]" 
-                        />
-                        <span className="text-[10px] text-[#7fae8d] w-[34px] text-right">{m.zoom}%</span>
+                      <div className="flex flex-col gap-2 mb-3">
+                        <div className="flex items-center gap-2">
+                          <label className="m-0 whitespace-nowrap text-[11px] tracking-[1.5px] uppercase text-[#7fae8d] w-[40px]">Zoom</label>
+                          <input 
+                            type="range" 
+                            min="50" 
+                            max="300" 
+                            value={m.zoom} 
+                            onChange={(e) => updateMember(i, 'zoom', Number(e.target.value))}
+                            className="flex-1 accent-[#d7e02b]" 
+                          />
+                          <span className="text-[10px] text-[#7fae8d] w-[34px] text-right">{m.zoom}%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="m-0 whitespace-nowrap text-[11px] tracking-[1.5px] uppercase text-[#7fae8d] w-[40px]">Angle</label>
+                          <input 
+                            type="range" 
+                            min="-180" 
+                            max="180" 
+                            value={m.rotation} 
+                            onChange={(e) => updateMember(i, 'rotation', Number(e.target.value))}
+                            className="flex-1 accent-[#d7e02b]" 
+                          />
+                          <span className="text-[10px] text-[#7fae8d] w-[34px] text-right">{m.rotation}°</span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -336,7 +425,7 @@ export default function TeamFramePage() {
             </button>
 
             <div className="text-[11px] text-[#7fae8d] leading-relaxed mt-4 pt-3.5 border-t border-dashed border-[#1e3a28]">
-              <b className="text-[#eaf5ee]">Tip:</b> you don't need to fill all 3 members. If you have fewer, just leave the rest empty!
+              <b className="text-[#eaf5ee]">Tip:</b> drag the photos in the preview to align them, or hold Shift to rotate! You don't need to fill all 3 members. If you have fewer, just leave the rest empty!
             </div>
           </div>
 
@@ -351,7 +440,12 @@ export default function TeamFramePage() {
             >
               <canvas 
                 ref={canvasRef}
+                onMouseDown={handleCanvasMouseDown}
+                onMouseMove={handleCanvasMouseMove}
+                onMouseUp={handleCanvasMouseUp}
+                onMouseLeave={handleCanvasMouseUp}
                 className="w-full max-w-[800px] h-auto rounded-[18px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] block [transform-style:preserve-3d] transition-all duration-150 hover:shadow-[0_45px_80px_-20px_rgba(0,0,0,0.85),0_0_40px_rgba(215,224,43,0.15)]"
+                style={{ cursor: draggedMemberIndex !== -1 ? 'grabbing' : 'grab', touchAction: 'none' }}
               ></canvas>
             </div>
           </div>

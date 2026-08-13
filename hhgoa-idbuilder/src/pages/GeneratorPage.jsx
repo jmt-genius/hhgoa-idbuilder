@@ -4,6 +4,8 @@ import Footer from '../components/Footer'
 import SideRails from '../components/SideRails'
 import FormatSelector from '../components/FormatSelector'
 import PfpGenerator from '../components/PfpGenerator'
+import IdGeneratorPage from './IdGeneratorPage'
+import TeamFramePage from './TeamFramePage'
 
 export default function GeneratorPage() {
   const [format, setFormat] = useState('pfp')
@@ -34,33 +36,26 @@ export default function GeneratorPage() {
           {format === 'pfp' && <PfpGenerator />}
 
           {format === 'builder' && (
-            <div style={{ width: '100%', maxWidth: '1280px' }}>
-              <iframe
-                src="/hacker-house-goa-id-generator.html"
-                style={{
-                  width: '100%',
-                  height: '1050px',
-                  border: 'none',
-                  borderRadius: '16px',
-                  boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-                  background: 'rgba(7, 19, 12, 0.4)'
-                }}
-                title="Builder Pass Generator"
-              />
+            <div style={{ width: '100%', maxWidth: '1280px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ transform: 'scale(0.95)', transformOrigin: 'top center', width: '100%' }}>
+                <IdGeneratorPage />
+              </div>
             </div>
           )}
 
           {format === 'team' && (
             <div style={{ width: '100%', maxWidth: '1380px' }}>
               <iframe
-                src="/hacker-house-goa-team-frame-generator.html"
+                src="/hacker-house-goa-team-frame-generator-2-3.html"
+                scrolling="no"
                 style={{
                   width: '100%',
-                  height: '1150px',
+                  height: '2000px',
                   border: 'none',
                   borderRadius: '16px',
                   boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-                  background: 'rgba(7, 19, 12, 0.4)'
+                  background: 'rgba(7, 19, 12, 0.4)',
+                  overflow: 'hidden'
                 }}
                 title="Team Builder Pass Generator"
               />
