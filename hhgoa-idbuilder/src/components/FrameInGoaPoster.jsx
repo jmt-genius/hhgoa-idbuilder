@@ -10,13 +10,18 @@ export default function FrameInGoaPoster() {
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current && posterRef.current) {
+        if (window.innerWidth <= 900) {
+          posterRef.current.style.removeProperty('--scale');
+          return;
+        }
+
         const containerWidth = containerRef.current.clientWidth;
-        const containerHeight = window.innerHeight; // or containerRef.current.clientHeight
+        const containerHeight = window.innerHeight;
 
         // 1600x900 is the base size
         const scaleX = containerWidth / 1600;
         const scaleY = containerHeight / 900;
-        const scale = Math.min(scaleX, scaleY, 1); // Don't scale up past 1
+        const scale = Math.min(scaleX, scaleY, 1);
 
         posterRef.current.style.setProperty('--scale', scale.toString());
       }

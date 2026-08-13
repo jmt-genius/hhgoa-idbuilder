@@ -382,6 +382,23 @@ body {
   opacity: 0.7;
 }
 
+@media (max-width: 520px) {
+  .tab-toggle {
+    max-width: 100%;
+  }
+
+  .tab-toggle button {
+    padding: 8px 4px;
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+  }
+
+  .tab-toggle button span {
+    font-size: 0.44rem;
+    letter-spacing: 0.04em;
+  }
+}
+
 /* ── Color selector ─────────────────────────────────── */
 .color-swatch {
   width: 28px;

@@ -290,19 +290,19 @@ export default function TeamFramePage() {
 
   return (
     <div className="min-h-screen font-mono text-[#eaf5ee] bg-[#07130c]" style={{ background: 'radial-gradient(circle at 15% 10%, #0e2618 0%, transparent 45%), radial-gradient(circle at 85% 90%, #10281a 0%, transparent 40%), #07130c' }}>
-      <div className="max-w-[1280px] mx-auto px-5 py-9 pb-20">
-        <header className="flex items-baseline justify-between gap-5 flex-wrap mb-7 border-b border-dashed border-[#1e3a28] pb-[18px]">
+      <div className="max-w-[1280px] mx-auto px-3.5 sm:px-5 py-5 sm:py-9 pb-20">
+        <header className="flex items-baseline justify-between gap-3.5 sm:gap-5 flex-wrap mb-5 sm:mb-7 border-b border-dashed border-[#1e3a28] pb-3.5 sm:pb-[18px]">
           <div>
-            <div className="text-xs tracking-[2px] text-[#7fae8d] uppercase">&gt;&gt;&gt; INIT: TEAM_GENERATOR</div>
-            <div className="font-['Space_Grotesk'] font-bold text-[22px] tracking-[0.5px] text-[#d7e02b]">
+            <div className="text-[10px] sm:text-xs tracking-[2px] text-[#7fae8d] uppercase">&gt;&gt;&gt; INIT: TEAM_GENERATOR</div>
+            <div className="font-['Space_Grotesk'] font-bold text-[18px] sm:text-[22px] tracking-[0.5px] text-[#d7e02b]">
               HACKER HOUSE <span className="text-[#e8226f]">गोवा</span>
             </div>
           </div>
-          <div className="text-xs tracking-[2px] text-[#7fae8d] uppercase">HHGOA'26 · BUILD YOUR PASS</div>
+          <div className="text-[10px] sm:text-xs tracking-[1.5px] sm:tracking-[2px] text-[#7fae8d] uppercase">HHGOA'26 · BUILD YOUR PASS</div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-[420px_1fr] gap-7 items-start">
-          <div className="bg-gradient-to-b from-[#0c1f14] to-[#0a1a11] border border-[#1e3a28] rounded-[14px] p-[22px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-6 sm:gap-7 items-start">
+          <div className="bg-gradient-to-b from-[#0c1f14] to-[#0a1a11] border border-[#1e3a28] rounded-[14px] p-4 sm:p-[22px]">
             <h2 className="font-['Space_Grotesk'] text-[14px] tracking-[2px] uppercase text-[#d7e02b] m-0 mb-1.5 flex items-center gap-2 before:content-['›'] before:text-[#e8226f]">
               Team Builder
             </h2>

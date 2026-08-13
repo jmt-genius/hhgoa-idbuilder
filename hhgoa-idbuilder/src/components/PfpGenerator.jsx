@@ -187,9 +187,9 @@ export default function PfpGenerator() {
           display: 'flex',
           alignItems: 'baseline',
           justifyContent: 'space-between',
-          gap: '20px',
+          gap: '14px',
           flexWrap: 'wrap',
-          padding: '18px 24px',
+          padding: '16px clamp(14px, 3vw, 24px)',
           borderBottom: '1px dashed rgba(30, 58, 40, 0.9)',
         }}
       >
@@ -201,7 +201,7 @@ export default function PfpGenerator() {
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 700,
-              fontSize: '22px',
+              fontSize: 'clamp(18px, 5vw, 22px)',
               letterSpacing: '0.5px',
               color: '#f6cf1f',
             }}
@@ -209,7 +209,7 @@ export default function PfpGenerator() {
             HACKER HOUSE <span style={{ color: '#e8226f' }}>गोवा</span>
           </div>
         </div>
-        <div style={{ fontSize: '11px', letterSpacing: '2px', color: '#7fae8d', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: '11px', letterSpacing: '1.5px', color: '#7fae8d', textTransform: 'uppercase' }}>
           HHGOA'26 · FRAME YOUR PFP
         </div>
       </header>
@@ -222,11 +222,12 @@ export default function PfpGenerator() {
           gridTemplateColumns: '380px 1fr',
           gap: '28px',
           alignItems: 'start',
-          padding: '22px 24px 28px',
+          padding: '22px clamp(14px, 3vw, 24px) 28px',
         }}
       >
         {/* ── LEFT: Controls panel ── */}
         <div
+          className="pfp-controls-panel"
           style={{
             background: 'linear-gradient(180deg, #0c1f14 0%, #0a1a11 100%)',
             border: '1px solid rgba(30, 58, 40, 0.9)',
@@ -548,6 +549,11 @@ export default function PfpGenerator() {
         @media (max-width: 900px) {
           .pfp-inner-grid {
             grid-template-columns: 1fr !important;
+            gap: 20px !important;
+            padding: 16px 12px 24px !important;
+          }
+          .pfp-controls-panel {
+            padding: 16px 14px !important;
           }
         }
       `}</style>

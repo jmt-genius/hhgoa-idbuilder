@@ -21,10 +21,12 @@ export default function GeneratorPage() {
           flexDirection: 'column',
           alignItems: 'center',
           minHeight: '100dvh',
-          padding: '100px 20px 64px',
+          padding: 'clamp(40px, 7vw, 90px) clamp(12px, 3vw, 20px) 56px',
+          width: '100%',
+          overflowX: 'hidden',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '28px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '100%', maxWidth: '100%' }}>
           {/* Format selector */}
           <FormatSelector value={format} onChange={setFormat} />
 
@@ -33,7 +35,7 @@ export default function GeneratorPage() {
 
           {format === 'builder' && (
             <div style={{ width: '100%', maxWidth: '1280px', display: 'flex', justifyContent: 'center' }}>
-              <div style={{ transform: 'scale(0.95)', transformOrigin: 'top center', width: '100%' }}>
+              <div style={{ width: '100%' }}>
                 <IdGeneratorPage />
               </div>
             </div>
